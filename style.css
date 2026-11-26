@@ -1,0 +1,479 @@
+
+import tkinter as tk
+from tkinter import ttk, messagebox
+import mysql.connector
+from datetime import datetime
+
+# ================= DATABASE =================
+
+def koneksi():
+    return mysql.connector.connect(
+        host="localhost",
+        user="root",
+        password="",
+        database="manajemen_proyek"
+    )
+
+# ================= WARNA =================
+
+BG = "#F1F5F9"
+NAVY = "#172554"
+BLUE = "#2563EB"
+WHITE = "#FFFFFF"
+TEXT = "#1E293B"
+MUTED = "#64748B"
+RED = "#DC2626"
+
+# ================= WINDOW =================
+
+root = tk.Tk()
+root.title("Manajemen Proyek")
+root.geometry("1150x700")
+root.minsize(950, 600)
+root.configure(bg=BG)
+
+style = ttk.Style()
+style.theme_use("clam")
+
+style.configure(
+    "Treeview",
+    background=WHITE,
+    foreground=TEXT,
+    rowheight=38,
+    fieldbackground=WHITE,
+    font=("Arial", 10)
+)
+
+style.configure(
+    "Treeview.Heading",
+    background="#E2E8F0",
+    foreground=NAVY,
+    font=("Arial", 10, "bold"),
+    padding=12
+)
+
+style.map(
+    "Treeview",
+    background=[("selected", "#BFDBFE")],
+    foreground=[("selected", NAVY)]
+)
+
+# ================= SIDEBAR =================
+
+sidebar = tk.Frame(root, bg=NAVY, width=230)
+sidebar.pack(side="left", fill="y")
+sidebar.pack_propagate(False)
+
+tk.Label(
+    sidebar,
+    text="PROJECT APP",
+    font=("Arial", 20, "bold"),
+    bg=NAVY,
+    fg=WHITE
+).pack(pady=(35, 5))
+
+tk.Label(
+    sidebar,
+    text="PROJECT MANAGEMENT",
+    font=("Arial", 8),
+    bg=NAVY,
+    fg="#93C5FD"
+).pack(pady=(0, 45))
+
+def menu_button(text, command):
+    btn = tk.Button(
+        sidebar,
+        text=text,
+        command=command,
+        font=("Arial", 11, "bold"),
+        bg=NAVY,
+        fg=WHITE,
+        activebackground=BLUE,
+        activeforeground=WHITE,
+        relief="flat",
+        anchor="w",
+        padx=25,
+        pady=15,
+        cursor="hand2"
+    )
+    btn.pack(fill="x", padx=12, pady=4)
+    return btn
+
+# ================= MAIN CONTENT =================
+
+main = tk.Frame(root, bg=BG)
+main.pack(side="left", fill="both", expand=True)
+
+header = tk.Frame(main, bg=WHITE, height=85)
+header.pack(fill="x")
+header.pack_propagate(False)
+
+tk.Label(
+    header,
+    text="Dashboard Proyek",
+    font=("Arial", 22, "bold"),
+    bg=WHITE,
+    fg=NAVY
+).pack(side="left", padx=30, pady=23)
+
+tk.Label(
+    header,
+    text="Sistem Manajemen Proyek",
+    font=("Arial", 10),
+    bg=WHITE,
+    fg=MUTED
+).pack(side="right", padx=30)
+
+content = tk.Frame(main, bg=BG)
+content.pack(fill="both", expand=True, padx=28, pady=25)
+
+tk.Label(
+    content,
+    text="Selamat Datang!",
+    font=("Arial", 19, "bold"),
+    bg=BG,
+    fg=TEXT
+).pack(anchor="w")
+
+tk.Label(
+    content,
+    text="Kelola semua data proyek dengan mudah.",
+    font=("Arial", 10),
+    bg=BG,
+    fg=MUTED
+).pack(anchor="w", pady=(5, 20))
+
+# ================= DASHBOARD CARDS =================
+
+cards = tk.Frame(content, bg=BG)
+cards.pack(fill="x", pady=(0, 22))
+
+def buat_card(parent, judul, warna):
+    card = tk.Frame(parent, bg=WHITE, height=105)
+    card.pack(side="left", fill="x", expand=True, padx=(0, 12))
+    card.pack_propagate(False)
+
+    tk.Label(
+        card,
+        text=judul,
+        font=("Arial", 10),
+        bg=WHITE,
+        fg=MUTED
+    ).pack(anchor="w", padx=18, pady=(16, 5))
+
+    nilai = tk.Label(
+        card,
+        text="0",
+        font=("Arial", 24, "bold"),
+        bg=WHITE,
+        fg=warna
+    )
+    nilai.pack(anchor="w", padx=18)
+
+    return nilai
+
+total_label = buat_card(cards, "TOTAL PROYEK", BLUE)
+anggota_label = buat_card(cards, "TOTAL ANGGOTA", "#059669")
+
+# ================= FORM =================
+
+form = tk.Frame(content, bg=WHITE)
+form.pack(fill="x", pady=(0, 20))
+
+tk.Label(
+    form,
+    text="Tambah Proyek Baru",
+    font=("Arial", 14, "bold"),
+    bg=WHITE,
+    fg=NAVY
+).pack(anchor="w", padx=20, pady=(17, 12))
+
+input_area = tk.Frame(form, bg=WHITE)
+input_area.pack(fill="x", padx=20)
+
+def buat_input(parent, label, placeholder):
+    frame = tk.Frame(parent, bg=WHITE)
+    frame.pack(side="left", fill="x", expand=True, padx=(0, 12))
+
+    tk.Label(
+        frame,
+        text=label,
+        font=("Arial", 9, "bold"),
+        bg=WHITE,
+        fg=TEXT
+    ).pack(anchor="w", pady=(0, 7))
+
+    entry = tk.Entry(
+        frame,
+        font=("Arial", 10),
+        relief="solid",
+        bd=1
+    )
+    entry.pack(fill="x", ipady=9)
+    entry.insert(0, placeholder)
+
+    return entry
+
+anggota_entry = buat_input(
+    input_area, "Jumlah Anggota", "Contoh: 5"
+)
+
+mulai_entry = buat_input(
+    input_area, "Tanggal Mulai", "YYYY-MM-DD"
+)
+
+selesai_entry = buat_input(
+    input_area, "Tanggal Selesai", "YYYY-MM-DD"
+)
+
+# ================= BUTTON =================
+
+button_area = tk.Frame(form, bg=WHITE)
+button_area.pack(fill="x", padx=20, pady=17)
+
+# ================= TABLE =================
+
+table_card = tk.Frame(content, bg=WHITE)
+table_card.pack(fill="both", expand=True)
+
+table_header = tk.Frame(table_card, bg=WHITE)
+table_header.pack(fill="x", padx=20, pady=15)
+
+tk.Label(
+    table_header,
+    text="Daftar Proyek",
+    font=("Arial", 14, "bold"),
+    bg=WHITE,
+    fg=NAVY
+).pack(side="left")
+
+table_frame = tk.Frame(table_card, bg=WHITE)
+table_frame.pack(fill="both", expand=True, padx=20, pady=(0, 15))
+
+kolom = (
+    "id_proyek",
+    "anggota_proyek",
+    "tanggal_mulai",
+    "tanggal_selesai"
+)
+
+tabel = ttk.Treeview(
+    table_frame,
+    columns=kolom,
+    show="headings"
+)
+
+tabel.heading("id_proyek", text="ID PROYEK")
+tabel.heading("anggota_proyek", text="ANGGOTA")
+tabel.heading("tanggal_mulai", text="TANGGAL MULAI")
+tabel.heading("tanggal_selesai", text="TANGGAL SELESAI")
+
+tabel.column("id_proyek", width=100, anchor="center")
+tabel.column("anggota_proyek", width=150, anchor="center")
+tabel.column("tanggal_mulai", width=180, anchor="center")
+tabel.column("tanggal_selesai", width=180, anchor="center")
+
+scroll = ttk.Scrollbar(
+    table_frame,
+    orient="vertical",
+    command=tabel.yview
+)
+
+tabel.configure(yscrollcommand=scroll.set)
+
+tabel.pack(side="left", fill="both", expand=True)
+scroll.pack(side="right", fill="y")
+
+# ================= REFRESH DATA =================
+
+def refresh_data():
+    for item in tabel.get_children():
+        tabel.delete(item)
+
+    try:
+        db = koneksi()
+        cursor = db.cursor(dictionary=True)
+
+        cursor.execute(
+            "SELECT * FROM db_manajemen_proyek ORDER BY id_proyek"
+        )
+
+        data = cursor.fetchall()
+
+        for row in data:
+            tabel.insert("", "end", values=(
+                row["id_proyek"],
+                row["anggota_proyek"],
+                row["tanggal_mulai"],
+                row["tanggal_selesai"]
+            ))
+
+        total_label.config(text=str(len(data)))
+
+        jumlah = sum(int(row["anggota_proyek"]) for row in data)
+        anggota_label.config(text=str(jumlah))
+
+        cursor.close()
+        db.close()
+
+    except mysql.connector.Error as e:
+        messagebox.showerror("Database Error", str(e))
+
+# ================= TAMBAH DATA =================
+
+def tambah_data():
+    anggota = anggota_entry.get().strip()
+    mulai = mulai_entry.get().strip()
+    selesai = selesai_entry.get().strip()
+
+    if not anggota or not mulai or not selesai:
+        messagebox.showwarning(
+            "Peringatan", "Semua kolom harus diisi!"
+        )
+        return
+
+    try:
+        jumlah = int(anggota)
+
+        if jumlah < 1:
+            raise ValueError
+
+        tanggal_mulai = datetime.strptime(mulai, "%Y-%m-%d").date()
+        tanggal_selesai = datetime.strptime(selesai, "%Y-%m-%d").date()
+
+        if tanggal_selesai < tanggal_mulai:
+            messagebox.showwarning(
+                "Peringatan",
+                "Tanggal selesai tidak boleh sebelum tanggal mulai!"
+            )
+            return
+
+        db = koneksi()
+        cursor = db.cursor()
+
+        cursor.execute("""
+            INSERT INTO db_manajemen_proyek
+            (anggota_proyek, tanggal_mulai, tanggal_selesai)
+            VALUES (%s, %s, %s)
+        """, (jumlah, tanggal_mulai, tanggal_selesai))
+
+        db.commit()
+        cursor.close()
+        db.close()
+
+        messagebox.showinfo(
+            "Berhasil", "Data proyek berhasil ditambahkan!"
+        )
+
+        anggota_entry.delete(0, tk.END)
+        mulai_entry.delete(0, tk.END)
+        selesai_entry.delete(0, tk.END)
+
+        refresh_data()
+
+    except ValueError:
+        messagebox.showerror(
+            "Kesalahan",
+            "Jumlah anggota harus angka dan tanggal harus YYYY-MM-DD!"
+        )
+
+    except mysql.connector.Error as e:
+        messagebox.showerror("Database Error", str(e))
+
+# ================= HAPUS DATA =================
+
+def hapus_data():
+    selected = tabel.selection()
+
+    if not selected:
+        messagebox.showwarning(
+            "Peringatan", "Pilih proyek yang ingin dihapus!"
+        )
+        return
+
+    values = tabel.item(selected[0], "values")
+    id_proyek = values[0]
+
+    konfirmasi = messagebox.askyesno(
+        "Konfirmasi",
+        "Yakin ingin menghapus proyek ini?"
+    )
+
+    if not konfirmasi:
+        return
+
+    try:
+        db = koneksi()
+        cursor = db.cursor()
+
+        cursor.execute(
+            "DELETE FROM db_manajemen_proyek WHERE id_proyek=%s",
+            (id_proyek,)
+        )
+
+        db.commit()
+        cursor.close()
+        db.close()
+
+        messagebox.showinfo(
+            "Berhasil", "Proyek berhasil dihapus!"
+        )
+
+        refresh_data()
+
+    except mysql.connector.Error as e:
+        messagebox.showerror("Database Error", str(e))
+
+# ================= BUTTON STYLE =================
+
+def buat_tombol(parent, text, command, warna):
+    return tk.Button(
+        parent,
+        text=text,
+        command=command,
+        bg=warna,
+        fg=WHITE,
+        activebackground=warna,
+        activeforeground=WHITE,
+        font=("Arial", 10, "bold"),
+        relief="flat",
+        padx=18,
+        pady=10,
+        cursor="hand2"
+    )
+
+buat_tombol(
+    button_area, "+ Tambah Proyek",
+    tambah_data, BLUE
+).pack(side="left", padx=(0, 10))
+
+buat_tombol(
+    button_area, "Hapus Proyek",
+    hapus_data, RED
+).pack(side="left", padx=10)
+
+buat_tombol(
+    button_area, "Refresh",
+    refresh_data, "#475569"
+).pack(side="left", padx=10)
+
+# ================= SIDEBAR MENU =================
+
+menu_button("▣   Dashboard", refresh_data)
+menu_button("＋   Tambah Proyek", lambda: anggota_entry.focus_set())
+menu_button("↻   Refresh Data", refresh_data)
+menu_button("✕   Keluar", root.destroy)
+
+tk.Label(
+    sidebar,
+    text="Project Management\nVersion 1.0",
+    font=("Arial", 9),
+    bg=NAVY,
+    fg="#94A3B8",
+    justify="left"
+).pack(side="bottom", pady=25)
+
+# ================= RUN =================
+
+refresh_data()
+root.mainloop()

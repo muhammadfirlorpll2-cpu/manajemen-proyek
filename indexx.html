@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manajemen Proyek</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+    <h1>Manajemen Proyek</h1>
+    <p>Kelola data proyek dengan mudah.</p>
+
+    <div class="card">
+        <h2>Tambah Proyek</h2>
+
+        <form action="/tambah" method="POST">
+            <label>Anggota Proyek</label>
+            <input type="number" name="anggota" required>
+
+            <label>Tanggal Mulai</label>
+            <input type="date" name="mulai" required>
+
+            <label>Tanggal Selesai</label>
+            <input type="date" name="selesai" required>
+
+            <button type="submit">Tambah Proyek</button>
+        </form>
+    </div>
+
+    <div class="card">
+        <h2>Daftar Proyek</h2>
+
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Anggota</th>
+                <th>Mulai</th>
+                <th>Selesai</th>
+                <th>Aksi</th>
+            </tr>
+
+            {% for p in data %}
+            <tr>
+                <td>{{ p.id_proyek }}</td>
+                <td>{{ p.anggota_proyek }}</td>
+                <td>{{ p.tanggal_mulai }}</td>
+                <td>{{ p.tanggal_selesai }}</td>
+                <td>
+                    <form action="/hapus/{{ p.id_proyek }}"
+                          method="POST"
+                          onsubmit="return confirm('Hapus proyek ini?')">
+                        <button class="hapus" type="submit">Hapus</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
